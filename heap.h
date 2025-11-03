@@ -20,6 +20,7 @@ struct MinHeap {
             cout << "Heap is full, cannot push index " << idx << "\n";
             return;
         }
+
         data[size] = idx;             // insert new element at the end
         upheap(size, weightArr);      // restore order using upheap()
         ++size;
@@ -30,20 +31,19 @@ struct MinHeap {
         // Replace root with last element, then call downheap()
         if (size == 0) {
             cout << "Heap is empty, nothing to remove.\n";
-            return 0;
+            return -1;
         }
 
         // remove and return smallest index
         int smallestIdx = data[0];
-        if (size == 1) {
-            --size;
-            return smallestIdx;
-        }
+        --size;
 
         //move last element to root, decrease size, and downheap
-        data[0] = data[size - 1];
-        --size;
-        downheap(0, weightArr);
+        if (size > 0) {
+            data[0] = data[size - 1];
+            downheap(0, weightArr);
+        }
+
         return smallestIdx;
     }
 

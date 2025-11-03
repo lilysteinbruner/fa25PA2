@@ -91,15 +91,21 @@ int createLeafNodes(int freq[]) {
 // Step 3: Build the encoding tree using heap operations
 int buildEncodingTree(int nextFree) {
     // TODO:
+    cout << "Entering buildEncodingTree with nextFree=" << nextFree << endl;
+
     // 1. Create a MinHeap object.
     MinHeap heap;
 
     // 2. Push all leaf node indices into the heap.
     for (int i = 0; i < nextFree; ++i) {
+        cout << "Pushing " << i << " weight=" << weightArr[i] << endl;
         if (weightArr[i] > 0) {
             heap.push(i, weightArr);
         }
     }
+
+    cout << "Finished pushing. Heap size=" << heap.size << endl;
+
 
     // handles empty input
     if (heap.size == 0) {
@@ -117,11 +123,23 @@ int buildEncodingTree(int nextFree) {
         int idx1 = heap.pop(weightArr);
         int idx2 = heap.pop(weightArr);
 
+        if (idx1 == -1 || idx2 == -1) {
+            cout << "Heap is empty, nothing to remove.\n";
+            return -1;
+        }
+
         //    - Create a new parent node with combined weight
         //    - Set left/right pointers
         int parent = nextFree++;
+
+        if (nextFree >= MAX_NODES) {
+            cout << "Node array overflow";
+            return -1;
+        }
+
         weightArr[parent] = weightArr[idx1] + weightArr[idx2];
         charArr[parent] = '\0';  // internal node
+        if (weightArr[idx2] < weightArr[idx1]) swap(idx1, idx2);
         leftArr[parent] = idx1;  // first popped --> left
         rightArr[parent] = idx2; // second popped --> right
 
@@ -131,6 +149,7 @@ int buildEncodingTree(int nextFree) {
 
     // 4. Return the index of the last remaining node (root)
     int root = heap.pop(weightArr);
+
     return root;
 }
 
@@ -140,6 +159,44 @@ void generateCodes(int root, string codes[]) {
     // Use stack<pair<int, string>> to simulate DFS traversal.
     // Left edge adds '0', right edge adds '1'.
     // Record code when a leaf node is reached.
+    for (int i = 0; i < 26; ++i) codes[i].clear();
+
+    if (root == -1) return;
+
+    struct Frame {
+        int idx;
+        string code;
+    };
+
+    stack<Frame> stack;
+    stack.push({root, ""});
+
+    while (!stack.empty()) {
+        Frame f = stack.top();
+        stack.pop();
+
+        int idx = f.idx;
+        string cur = f.code;
+
+        if (leftArr[idx] == -1 && rightArr[idx] == -1) {
+            if (charArr[idx] >= 'a' && charArr[idx] <= 'z') {
+                char c = charArr[idx];
+
+                if (cur.empty()) cur = "0";
+                codes[c - 'a'] = cur;
+            }
+            continue;
+        }
+
+        if (rightArr[idx] != -1) {
+            stack.push({ rightArr[idx], cur + "1" });
+        }
+
+        if (leftArr[idx] != -1) {
+            stack.push({ leftArr[idx], cur + "0"});
+        }
+    }
+
 }
 
 // Step 5: Print table and encoded message
