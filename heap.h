@@ -18,6 +18,7 @@ struct MinHeap {
         // TODO: insert index at end of heap, restore order using upheap()
         if (size >= 64) {
             cout << "Heap is full, cannot push index " << idx << "\n";
+            return;
         }
         data[size] = idx;             // insert new element at the end
         upheap(size, weightArr);      // restore order using upheap()
@@ -50,10 +51,17 @@ struct MinHeap {
         // TODO: swap child upward while smaller than parent
         while (pos > 0) {
             int parent = (pos - 1) / 2;
-            if (weightArr[data[pos]] < weightArr[data[parent]]) {
-                int temp = data[pos];
+            int childIdx = data[pos];
+            int parentIdx = data[parent];
+
+            int childW = weightArr[childIdx];
+            int parentW = weightArr[parentIdx];
+
+            //if child has smaller or equal weight but smaller index, swap upward.
+            if (childW < parentW || (childW == parentW && childIdx < parentIdx)) {
+                int tmp = data[pos];
                 data[pos] = data[parent];
-                data[parent] = temp;
+                data[parent] = tmp;
                 pos = parent;
             } else {
                 return;
@@ -66,20 +74,20 @@ struct MinHeap {
         while (true) {
             int left = 2 * pos + 1;
             int right = left + 1;
+
             if (left >= size) return;  // no children
 
             // pick smaller child
             int smallest = left;
             int leftIdx = data[left];
-            int smallestIdx = data[smallest];
-            int leftW = weightArr[leftIdx];
-            int smallestW = weightArr[smallestIdx];
+            int smallestIdx = leftIdx;
+            int smallestW = weightArr[leftIdx];
 
             if (right < size) {
                 int rightIdx = data[right];
                 int rightW = weightArr[rightIdx];
                 // if right is smaller or tie and smaller index, choose right
-                if (rightW < leftW || (rightW == leftW && rightIdx < leftIdx)) {
+                if (rightW < smallestW || (rightW == smallestW && rightIdx < smallestIdx)) {
                     smallest = right;
                     smallestIdx = data[smallest];
                     smallestW = weightArr[smallestIdx];
