@@ -36,13 +36,15 @@ struct MinHeap {
 
         // remove and return smallest index
         int smallestIdx = data[0];
-        --size;
 
         //move last element to root, decrease size, and downheap
         if (size > 0) {
             data[0] = data[size - 1];
-            downheap(0, weightArr);
         }
+
+        --size;
+        downheap(0, weightArr);
+
 
         return smallestIdx;
     }

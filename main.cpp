@@ -91,21 +91,15 @@ int createLeafNodes(int freq[]) {
 // Step 3: Build the encoding tree using heap operations
 int buildEncodingTree(int nextFree) {
     // TODO:
-    cout << "Entering buildEncodingTree with nextFree=" << nextFree << endl;
-
     // 1. Create a MinHeap object.
     MinHeap heap;
 
     // 2. Push all leaf node indices into the heap.
     for (int i = 0; i < nextFree; ++i) {
-        cout << "Pushing " << i << " weight=" << weightArr[i] << endl;
         if (weightArr[i] > 0) {
             heap.push(i, weightArr);
         }
     }
-
-    cout << "Finished pushing. Heap size=" << heap.size << endl;
-
 
     // handles empty input
     if (heap.size == 0) {
@@ -139,7 +133,9 @@ int buildEncodingTree(int nextFree) {
 
         weightArr[parent] = weightArr[idx1] + weightArr[idx2];
         charArr[parent] = '\0';  // internal node
-        if (weightArr[idx2] < weightArr[idx1]) swap(idx1, idx2);
+        if (weightArr[idx1] > weightArr[idx2] || (weightArr[idx1] == weightArr[idx2] && idx1 > idx2)) {
+            swap(idx1, idx2);
+        }
         leftArr[parent] = idx1;  // first popped --> left
         rightArr[parent] = idx2; // second popped --> right
 
